@@ -19,10 +19,11 @@ class PostsCollection(Resource):
     @api.expect(pagination_arguments)
     @api.marshal_with(page_of_blog_posts)
     def get(self):
-        1 / 0
         """
         Returns list of blog posts.
         """
+        from flask_api.api.errors import APIValueError
+        raise APIValueError('email', 'Invalid email.')
         args = pagination_arguments.parse_args(request)
         page = args.get("page", 1)
         per_page = args.get("per_page", 10)
