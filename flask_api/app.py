@@ -2,7 +2,7 @@ from flask import Flask, Blueprint
 from flask_api.database import db
 # from flask_api.api.blog.endpoints.posts import ns as blog_posts_namespace
 # from flask_api.api.blog.endpoints.categories import ns as blog_categories_namespace
-from flask_api import config
+from flask_api.config import configs
 from flask_api.api.restplus import api
 
 
@@ -10,14 +10,14 @@ app = Flask(__name__)
 
 
 def configure_app(flask_app):
-    flask_app.config['SERVER_NAME'] = config.FLASK_SERVER_NAME
-    flask_app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
-    flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.SQLALCHEMY_TRACK_MODIFICATIONS
+    flask_app.config['SERVER_NAME'] = configs["flask_server_name"]
+    flask_app.config['SQLALCHEMY_DATABASE_URI'] = configs["db"]["sqlalchemy_database_uri"]
+    flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = configs["db"]["sqlalchemy_track_modifications"]
 
-    flask_app.config['SWAGGER_UI_DOC_EXPANSION'] = config.RESTPLUS_SWAGGER_UI_DOC_EXPANSION
-    flask_app.config['RESTPLUS_VALIDATE'] = config.RESTPLUS_VALIDATE
-    flask_app.config['RESTPLUS_MASK_SWAGGER'] = config.RESTPLUS_MASK_SWAGGER
-    flask_app.config['ERROR_404_HELP'] = config.RESTPLUS_ERROR_404_HELP
+    flask_app.config['SWAGGER_UI_DOC_EXPANSION'] = configs["flaskplus"]["restplus_swagger_ui_doc_expansion"]
+    flask_app.config['RESTPLUS_VALIDATE'] = configs["flaskplus"]["restplus_validate"]
+    flask_app.config['RESTPLUS_MASK_SWAGGER'] = configs["flaskplus"]["restplus_mask_swagger"]
+    flask_app.config['ERROR_404_HELP'] = configs["flaskplus"]["restplus_error_404_help"]
 
 
 def initialize_app(flask_app):

@@ -3,13 +3,13 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from flask_api.app import app
 
-from flask_api.config import CERT_CRT_PATH, CERT_KEY_PATH
+from flask_api.config import configs
 
 
-if CERT_KEY_PATH and CERT_CRT_PATH:
+if configs["cert"]["cert_key_path"] and configs["cert"]["cert_crt_path"]:
     http_server = HTTPServer(WSGIContainer(app), ssl_options={
-        "certfile": CERT_CRT_PATH,
-        "keyfile": CERT_KEY_PATH,
+        "certfile": configs["cert"]["cert_key_path"],
+        "keyfile": configs["cert"]["cert_crt_path"],
     })
     http_server.listen(443)  # flask默认的端口
 else:
