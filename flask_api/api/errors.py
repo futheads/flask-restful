@@ -1,32 +1,56 @@
-class APIError(Exception):
-    """
-    the base APIError which contains error(required), data(optional) and message(optional)
-    """
-    def __init__(self, error, data="", message=""):
-        self.error = error
-        self.data = data
+class BaseError(Exception):
+    """Base Error Class"""
+
+    def __init__(self, code=400, message="", status="", field=None):
+        Exception.__init__(self)
+        self.code = code
         self.message = message
+        self.status = status
+        self.field = field
+
+    def to_dict(self):
+        return {"code": self.code,
+                "message": self.message,
+                "status": self.status,
+                "field": self.field, }
 
 
-class APIValueError(APIError):
-    """
-    Indicate the input value has error or invaild, The data specifies the error filed of input form.
-    """
-    def __init__(self, field, message=""):
-        super().__init__("value:invalid", field, message)
+class ServerError(BaseError):
+    def __init__(self, message="Internal server error"):
+        BaseError.__init__(self)
+        self.code = 500
+        self.message = message
+        self.status = "SERVER_ERROR"
 
 
-class APIResourceNotFound(APIError):
-    """
-    Indicate the resource was not found. The data specifies the resource name
-    """
-    def __init__(self, field, message=''):
-        super().__init__("value:notfound", field, message)
+class NotFoundError(BaseError):
+    def __init__(self, message="Not found"):
+        BaseError.__init__(self)
+        self.code = 404
+        self.message = message
+        self.status = "NOT_FOUND"
 
 
-class APIPermissionError(APIError):
-    """
-    Indicate the api has no permission.
-    """
-    def __init__(self, message=""):
-        super().__init__("permission:forbidden", "permission", message)
+class NotAuthorizedError(BaseError):
+    def __init__(self, message="Unauthorized"):
+        BaseError.__init__(self)
+        self.code = 401
+        self.message = message
+        self.status = "NOT_AUTHORIZED"
+
+
+class ValidationError(BaseError):
+    def __init__(self, field, message="Invalid field"):
+        BaseError.__init__(self)
+        self.code = 400
+        self.message = message
+        self.status = "INVALID_FIELD"
+        self.field = field
+
+
+class DatabaseNotFoundError(BaseError):
+    def __init__(self, message="A database result was required but none was found."):
+        BaseError.__init__(self)
+        self.code = 404
+        self.message = message
+        self.status = "DATABASE_NOT_FOUND"
