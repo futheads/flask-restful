@@ -19,7 +19,6 @@ class PostsCollection(Resource):
     @api.expect(pagination_arguments)
     @api.marshal_with(page_of_blog_posts)
     def get(self):
-        1 / 0
         """
         Returns list of blog posts.
         """

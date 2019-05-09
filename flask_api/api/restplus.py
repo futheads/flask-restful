@@ -3,7 +3,8 @@ import traceback
 
 from flask_restplus import Api
 from sqlalchemy.orm.exc import NoResultFound
-from flask_api import config
+from flask_api.config import configs
+from flask_api.api.errors import ServerError, NotFoundError, NotAuthorizedError, ValidationError, DatabaseNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -11,16 +12,24 @@ api = Api(version="1.0", title="Micro Blog API",
           description="A simple demonstration of a Flask RestPlus powered API")
 
 
-@api.errorhandler
-def default_error_handler(e):
-    message = "An unhandled exception occurred."
-    log.exception(message)
+@api.errorhandler(NotFoundError)
+@api.errorhandler(NotAuthorizedError)
+@api.errorhandler(ValidationError)
+def handle_error(error):
+    return error.to_dict(), getattr(error, "code")
 
-    if not config.FLASK_DEBUG:
-        return {'message': message}, 500
+
+@api.errorhandler
+def default_error_handler(error):
+    """Returns Internal server error"""
+    log.exception(error)
+    error = ServerError()
+    if not configs["flask_debug"]:
+        return error.to_dict(), getattr(error, "code", 500)
 
 
 @api.errorhandler(NoResultFound)
-def database_not_found_error_handler(e):
+def database_not_found_error_handler(error):
     log.warning(traceback.format_exc())
-    return {'message': 'A database result was required but none was found.'}, 404
+    error = DatabaseNotFoundError()
+    return error.to_dict(), getattr(error, "code", 404)
