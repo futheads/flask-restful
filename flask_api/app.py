@@ -9,7 +9,7 @@ from flask_api.api.restplus import api
 
 app = Flask(__name__)
 
-logging_conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "../logging.conf"))
+logging_conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "logging.conf"))
 logging.config.fileConfig(logging_conf_path)
 log = logging.getLogger(__name__)
 
