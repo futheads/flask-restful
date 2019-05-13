@@ -13,6 +13,16 @@ logging_conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "lo
 logging.config.fileConfig(logging_conf_path)
 log = logging.getLogger(__name__)
 
+REDIS_URL = "redis://localhost:6379/1"
+from flask_redis import FlaskRedis
+
+redis_store = FlaskRedis(app, decode_responses=True)
+
+
+redis_store.lpush('list1','mongdb','redis','mysql')
+print(redis_store.lrange('list1',0,-1))
+print(redis_store.llen('list1'))
+
 
 def configure_app(flask_app):
     flask_app.config["SERVER_NAME"] = configs["flask_server_name"]
@@ -27,6 +37,7 @@ def configure_app(flask_app):
 
 def initialize_app(flask_app):
     from flask_api.api.blog.endpoints import posts, categories
+    from flask_api.api.user.endpoints import user
     configure_app(flask_app)
 
     blueprint = Blueprint("api", __name__, url_prefix="/api")
