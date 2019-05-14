@@ -8,7 +8,15 @@ from flask_api.api.errors import ServerError, NotFoundError, NotAuthorizedError,
 
 log = logging.getLogger(__name__)
 
-api = Api(version="1.0", title="Micro Blog API",
+authorizations = {
+    "Bearer Auth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "token"
+    },
+}
+
+api = Api(security="Bearer Auth", authorizations=authorizations, version="1.0", title="Micro Blog API",
           description="A simple demonstration of a Flask RestPlus powered API")
 
 

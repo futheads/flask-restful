@@ -5,7 +5,7 @@ from flask import Flask, Blueprint
 from flask_api.database import db
 from flask_api.config import configs
 from flask_api.api.restplus import api
-
+from flask_redis import FlaskRedis
 
 app = Flask(__name__)
 
@@ -14,14 +14,7 @@ logging.config.fileConfig(logging_conf_path)
 log = logging.getLogger(__name__)
 
 REDIS_URL = "redis://localhost:6379/1"
-from flask_redis import FlaskRedis
-
 redis_store = FlaskRedis(app, decode_responses=True)
-
-
-redis_store.lpush('list1','mongdb','redis','mysql')
-print(redis_store.lrange('list1',0,-1))
-print(redis_store.llen('list1'))
 
 
 def configure_app(flask_app):
@@ -52,4 +45,4 @@ def main():
     log.info(">>>>> Starting development server at http://{}/api/ <<<<<".format(app.config["SERVER_NAME"]))
 
 
-main()
+# main()

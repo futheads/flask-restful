@@ -16,6 +16,7 @@ ns = api.namespace("users", description="Operations related to users")
 @ns.route("/")
 class UserCollection(Resource):
 
+    @api.header('X-Header', 'Some class header')
     @api.marshal_list_with(user)
     def get(self):
         """
@@ -24,6 +25,7 @@ class UserCollection(Resource):
         categories = User.query.all()
         return categories
 
+    @api.doc(security=None)
     @api.response(201, "User successfully created.")
     @api.expect(user)
     def post(self):
