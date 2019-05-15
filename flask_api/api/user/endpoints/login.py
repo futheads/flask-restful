@@ -63,7 +63,7 @@ class UserInfo(Resource):
         return {"code": 1, "nickname": nickname, "phone_number": phone_number}
 
 
-@ns.route("logout")
+@ns.route("/logout")
 class Logout(Resource):
 
     def post(self):
