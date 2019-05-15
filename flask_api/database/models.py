@@ -42,11 +42,13 @@ class User(db.Model):
     nickname = db.Column(db.String(30), index=True, nullable=True)
     register_time = db.Column(db.DateTime)
 
-    def __init__(self, phone_number, password, nickname, register_time):
+    def __init__(self, phone_number, password, nickname, register_time=None):
         self.phone_number = phone_number
         self. password = password
         self.nickname = nickname
-        self.register_time = nickname
+        if register_time is None:
+            register_time = datetime.utcnow()
+        self.register_time = register_time
 
     def __repr__(self):
         return "<User %r>" % self.nickname

@@ -43,3 +43,8 @@ user = api.model("Blog user", {
     "nickname": fields.String(required=True, description="nickname"),
     "register_time": fields.DateTime,
 })
+
+login = api.model("login user", {
+    "phone_number": fields.String(required=True, description="phone number"),
+    "password": fields.String(required=True, description="password"),
+})
