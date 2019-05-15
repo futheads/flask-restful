@@ -1,10 +1,13 @@
 import logging
 import traceback
+from functools import wraps
 
+from flask import request
 from flask_restplus import Api
 from sqlalchemy.orm.exc import NoResultFound
 from flask_api.config import configs
 from flask_api.api.errors import ServerError, NotFoundError, NotAuthorizedError, ValidationError, DatabaseNotFoundError
+from flask_api.database import redis_store
 
 log = logging.getLogger(__name__)
 
@@ -41,3 +44,18 @@ def database_not_found_error_handler(error):
     log.warning(traceback.format_exc())
     error = DatabaseNotFoundError()
     return error.to_dict(), getattr(error, "code", 404)
+
+
+def login_check(f):
+    """token 检查"""
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        token = request.headers.get("token")
+        if not token:
+            return {"code": 0, "message": "需要验证"}
+
+        phone_number = redis_store.get("token:%s" % token)
+        if not phone_number or token != redis_store.hget("user:%s" % phone_number, "token"):
+            return {"code": 2, "message": "验证信息错误"}
+        return f(*args, **kwargs)
+    return decorator

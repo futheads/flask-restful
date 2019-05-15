@@ -6,7 +6,7 @@ from flask import request
 from flask_restplus import Resource
 from flask_api.api.user.serializers import login
 
-from flask_api.api.restplus import api
+from flask_api.api.restplus import api, login_check
 from flask_api.database.models import User
 from flask_api.database import redis_store
 
@@ -47,18 +47,14 @@ class UserLogin(Resource):
 @ns.route("/user")
 class UserInfo(Resource):
 
+    @login_check
     def get(self):
         """
         get current user
         :return:
         """
         token = request.headers.get("token")
-        if not token:
-            return {"code": 0, "message": "需要验证"}
         phone_number = redis_store.get("token:%s" % token)
-        if not phone_number or token != redis_store.hget("user:%s" % phone_number, "token"):
-            return {"code": 2, "message": "验证信息错误"}
-
         nickname = redis_store.hget("user:%s" % phone_number, "nickname")
         return {"code": 1, "nickname": nickname, "phone_number": phone_number}
 
@@ -66,18 +62,14 @@ class UserInfo(Resource):
 @ns.route("/logout")
 class Logout(Resource):
 
+    @login_check
     def post(self):
         """
         user logout
         :return:
         """
         token = request.headers.get("token")
-        if not token:
-            return {"code": 0, "message": "需要验证"}
         phone_number = redis_store.get("token:%s" % token)
-        if not phone_number or token != redis_store.hget("user:%s" % phone_number, "token"):
-            return {"code": 2, "message": "验证信息错误"}
-
         redis_store.delete("token:%s" % token)
         redis_store.hmset("user:%s" % phone_number, {"app_online": 0})
         return {"code": 1, "message": "成功注销"}
