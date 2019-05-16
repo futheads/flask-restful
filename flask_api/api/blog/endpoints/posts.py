@@ -5,7 +5,7 @@ from flask_restplus import Resource
 from flask_api.api.blog.business import create_blog_post, update_post, delete_post
 from flask_api.api.blog.serializers import blog_post, page_of_blog_posts
 from flask_api.api.blog.parsers import pagination_arguments
-from flask_api.api.restplus import api, login_check
+from flask_api.api.restplus import api, login_check, log_record
 from flask_api.database.models import Post
 
 log = logging.getLogger(__name__)
@@ -16,6 +16,7 @@ ns = api.namespace("blog/posts", description="Operations related to blog posts")
 @ns.route("/")
 class PostsCollection(Resource):
 
+    @log_record
     @login_check
     @api.expect(pagination_arguments)
     @api.marshal_with(page_of_blog_posts)
@@ -32,6 +33,7 @@ class PostsCollection(Resource):
 
         return posts_page
 
+    @log_record
     @login_check
     @api.expect(blog_post)
     def post(self):
@@ -46,6 +48,7 @@ class PostsCollection(Resource):
 @api.response(404, "Post not found.")
 class PostItem(Resource):
 
+    @log_record
     @login_check
     @api.marshal_with(blog_post)
     def get(self, id):
@@ -54,6 +57,7 @@ class PostItem(Resource):
         """
         return Post.query.filter(Post.id == id).one()
 
+    @log_record
     @login_check
     @api.expect(blog_post)
     @api.response(204, "Post successfully updated.")
@@ -65,6 +69,7 @@ class PostItem(Resource):
         update_post(id, data)
         return None, 204
 
+    @log_record
     @login_check
     @api.response(204, "Post successfully deleted.")
     def delete(self, id):
@@ -80,6 +85,7 @@ class PostItem(Resource):
 @ns.route("/archive/<int:year>/<int:month>/<int:day>/")
 class PostsArchiveCollection(Resource):
 
+    @log_record
     @login_check
     @api.expect(pagination_arguments, validate=True)
     @api.marshal_with(page_of_blog_posts)

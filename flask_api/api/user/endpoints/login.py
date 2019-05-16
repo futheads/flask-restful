@@ -6,7 +6,8 @@ from flask import request
 from flask_restplus import Resource
 from flask_api.api.user.serializers import login_req, login_resp, current_user_resp
 
-from flask_api.api.restplus import NotFoundError, ValidationError, api, login_check, BaseResponse, base_model
+from flask_api.api.restplus import NotFoundError, ValidationError, api, login_check, BaseResponse, base_model, \
+    log_record
 from flask_api.database.models import User
 from flask_api.database import redis_store
 
@@ -22,6 +23,7 @@ ns = api.namespace("", description="Operations related to login")
 class UserLogin(Resource):
 
     @api.doc(security=None)
+    @log_record
     @api.expect(login_req)
     @api.marshal_with(login_resp)
     def post(self):
@@ -50,6 +52,7 @@ class UserLogin(Resource):
 @ns.route("/user")
 class UserInfo(Resource):
 
+    @log_record
     @login_check
     @api.marshal_with(current_user_resp)
     def get(self):
@@ -66,6 +69,7 @@ class UserInfo(Resource):
 @ns.route("/logout")
 class Logout(Resource):
 
+    @log_record
     @login_check
     @api.marshal_with(base_model)
     def post(self):

@@ -4,7 +4,7 @@ from flask import request
 from flask_restplus import Resource
 from flask_api.api.blog.business import create_category, delete_category, update_category
 from flask_api.api.blog.serializers import category, category_with_posts
-from flask_api.api.restplus import api, login_check
+from flask_api.api.restplus import api, login_check, log_record
 from flask_api.database.models import Category
 
 log = logging.getLogger(__name__)
@@ -15,6 +15,7 @@ ns = api.namespace("blog/categories", description="Operations related to blog ca
 @ns.route("/")
 class CategoryCollection(Resource):
 
+    @log_record
     @login_check
     @api.marshal_list_with(category)
     def get(self):
@@ -24,6 +25,7 @@ class CategoryCollection(Resource):
         categories = Category.query.all()
         return categories
 
+    @log_record
     @api.response(201, "Category successfully created.")
     @api.expect(category)
     def post(self):
@@ -39,6 +41,7 @@ class CategoryCollection(Resource):
 @api.response(404, "Category not found.")
 class CategoryItem(Resource):
 
+    @log_record
     @api.marshal_with(category_with_posts)
     def get(self, id):
         """
@@ -46,6 +49,7 @@ class CategoryItem(Resource):
         """
         return Category.query.filter(Category.id == id).one()
 
+    @log_record
     @api.expect(category)
     @api.response(204, "Category successfully updated.")
     def put(self, id):
@@ -68,6 +72,7 @@ class CategoryItem(Resource):
         update_category(id, data)
         return None, 204
 
+    @log_record
     @api.response(204, "Category successfully deleted.")
     def delete(self, id):
         """
