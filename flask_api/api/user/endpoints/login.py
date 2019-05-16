@@ -43,9 +43,12 @@ class UserLogin(Resource):
         m.update(password.encode("utf-8"))
         m.update(str(int(time.time())).encode("utf-8"))
         token = m.hexdigest()
-        redis_store.hmset("user:%s" % user.phone_number, {"token": token, "nickname": user.nickname, "app_online": 1})
-        redis_store.set("token:%s" % token, user.phone_number)
-        redis_store.expire("token:%s" % token, 3600*24*30)
+
+        pipeline = redis_store.pipeline()
+        pipeline.hmset("user:%s" % user.phone_number, {"token": token, "nickname": user.nickname, "app_online": 1})
+        pipeline.set("token:%s" % token, user.phone_number)
+        pipeline.expire("token:%s" % token, 3600*24*30)
+        pipeline.execute()
         return BaseResponse({"nickname": user.nickname, "token": token}, message="成功登录")
 
 
@@ -79,7 +82,9 @@ class Logout(Resource):
         """
         token = request.headers.get("token")
         phone_number = redis_store.get("token:%s" % token)
-        redis_store.delete("token:%s" % token)
-        redis_store.hmset("user:%s" % phone_number, {"app_online": 0})
+        pipeline = redis_store.pipeline()
+        pipeline.delete("token:%s" % token)
+        pipeline.hmset("user:%s" % phone_number, {"app_online": 0})
+        pipeline.execute()
         return BaseResponse(None, message="注销成功")
 
