@@ -77,3 +77,16 @@ def login_check(f):
             raise NotAuthorizedError("验证信息错误")
         return f(*args, **kwargs)
     return decorator
+
+
+def log_record(f):
+    """记录日志"""
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        log.info("Request url: %s %s" % (request.method, request.path))
+        log.info("Request args: %s" % request.args)
+        log.info("Request body: %s" % request.json)
+        response = f(*args, **kwargs)
+        log.info("Response: %s" % response)
+        return response
+    return decorator
