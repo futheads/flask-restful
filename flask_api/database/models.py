@@ -33,3 +33,22 @@ class Category(db.Model):
 
     def __repr__(self):
         return "<Category %r>" % self.name
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    phone_number = db.Column(db.String(11), index=True)
+    password = db.Column(db.String(30))
+    nickname = db.Column(db.String(30), index=True, nullable=True)
+    register_time = db.Column(db.DateTime)
+
+    def __init__(self, phone_number, password, nickname, register_time=None):
+        self.phone_number = phone_number
+        self. password = password
+        self.nickname = nickname
+        if register_time is None:
+            register_time = datetime.utcnow()
+        self.register_time = register_time
+
+    def __repr__(self):
+        return "<User %r>" % self.nickname

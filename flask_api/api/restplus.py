@@ -1,14 +1,25 @@
 import logging
 import traceback
+from functools import wraps
 
-from flask_restplus import Api
+from flask import request
+from flask_restplus import Api, fields
 from sqlalchemy.orm.exc import NoResultFound
 from flask_api.config import configs
 from flask_api.api.errors import ServerError, NotFoundError, NotAuthorizedError, ValidationError, DatabaseNotFoundError
+from flask_api.database import redis_store
 
 log = logging.getLogger(__name__)
 
-api = Api(version="1.0", title="Micro Blog API",
+authorizations = {
+    "Bearer Auth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "token"
+    },
+}
+
+api = Api(security="Bearer Auth", authorizations=authorizations, version="1.0", title="Micro Blog API",
           description="A simple demonstration of a Flask RestPlus powered API")
 
 
@@ -33,3 +44,36 @@ def database_not_found_error_handler(error):
     log.warning(traceback.format_exc())
     error = DatabaseNotFoundError()
     return error.to_dict(), getattr(error, "code", 404)
+
+
+base_model = api.model("base response model", {
+    "code": fields.Integer(readOnly=True, description="response status code", default=200),
+    "message": fields.String(readOnly=True, default="请求成功"),
+    "status": fields.String(readOnly=True, default="SUCCESS"),
+})
+
+
+class BaseResponse:
+    """
+    response 基类
+    """
+    def __init__(self, data, code=200, message="请求成功", status="SUCCESS"):
+        self.data = data
+        self.code = code
+        self.message = message
+        self.status = status
+
+
+def login_check(f):
+    """token 检查"""
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        token = request.headers.get("token")
+        if not token:
+            raise NotAuthorizedError("需要验证")
+
+        phone_number = redis_store.get("token:%s" % token)
+        if not phone_number or token != redis_store.hget("user:%s" % phone_number, "token"):
+            raise NotAuthorizedError("验证信息错误")
+        return f(*args, **kwargs)
+    return decorator

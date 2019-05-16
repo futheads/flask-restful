@@ -4,7 +4,7 @@ from flask import request
 from flask_restplus import Resource
 from flask_api.api.blog.business import create_category, delete_category, update_category
 from flask_api.api.blog.serializers import category, category_with_posts
-from flask_api.api.restplus import api
+from flask_api.api.restplus import api, login_check
 from flask_api.database.models import Category
 
 log = logging.getLogger(__name__)
@@ -15,6 +15,7 @@ ns = api.namespace("blog/categories", description="Operations related to blog ca
 @ns.route("/")
 class CategoryCollection(Resource):
 
+    @login_check
     @api.marshal_list_with(category)
     def get(self):
         """
