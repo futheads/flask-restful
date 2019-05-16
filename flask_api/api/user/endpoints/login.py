@@ -2,7 +2,7 @@ import logging
 import hashlib
 import time
 
-from flask import request
+from flask import request, g
 from flask_restplus import Resource
 from flask_api.api.user.serializers import login_req, login_resp, current_user_resp
 
@@ -63,10 +63,9 @@ class UserInfo(Resource):
         get current user
         :return:
         """
-        token = request.headers.get("token")
-        phone_number = redis_store.get("token:%s" % token)
-        nickname = redis_store.hget("user:%s" % phone_number, "nickname")
-        return BaseResponse({"nickname": nickname, "phone_number": phone_number})
+        user = g.current_user
+        nickname = redis_store.hget("user:%s" % user.phone_number, "nickname")
+        return BaseResponse({"nickname": nickname, "phone_number": user.phone_number})
 
 
 @ns.route("/logout")
@@ -80,11 +79,10 @@ class Logout(Resource):
         user logout
         :return:
         """
-        token = request.headers.get("token")
-        phone_number = redis_store.get("token:%s" % token)
+        user = g.current_user
         pipeline = redis_store.pipeline()
-        pipeline.delete("token:%s" % token)
-        pipeline.hmset("user:%s" % phone_number, {"app_online": 0})
+        pipeline.delete("token:%s" % g.token)
+        pipeline.hmset("user:%s" % user.phone_number, {"app_online": 0})
         pipeline.execute()
         return BaseResponse(None, message="注销成功")
 
