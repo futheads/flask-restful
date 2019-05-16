@@ -6,7 +6,8 @@ from flask import request, g
 from flask_restplus import Api, fields
 from sqlalchemy.orm.exc import NoResultFound
 from flask_api.config import configs
-from flask_api.api.errors import ServerError, NotFoundError, NotAuthorizedError, ValidationError, DatabaseNotFoundError
+from flask_api.api.errors import ServerError, NotFoundError, NotAuthorizedError, ValidationError, \
+    DatabaseNotFoundError, SMSError
 from flask_api.database import redis_store
 from flask_api.database.models import User
 
@@ -24,16 +25,7 @@ api = Api(security="Bearer Auth", authorizations=authorizations, version="1.0", 
           description="A simple demonstration of a Flask RestPlus powered API")
 
 
-# @api.before_request
-# def before_request():
-#     token = request.headers.get("token")
-#     phone_number = redis_store.get("token:%s" % token)
-#     if phone_number:
-#         g.current_user = User.query.filter_by(phone_number=phone_number).first()
-#         g.token = token
-#     return
-
-
+@api.errorhandler(SMSError)
 @api.errorhandler(NotFoundError)
 @api.errorhandler(NotAuthorizedError)
 @api.errorhandler(ValidationError)

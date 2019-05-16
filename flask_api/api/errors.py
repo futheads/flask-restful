@@ -54,3 +54,11 @@ class DatabaseNotFoundError(BaseError):
         self.code = 404
         self.message = message
         self.status = "DATABASE_NOT_FOUND"
+
+
+class SMSError(BaseError):
+    def __init__(self, message="short message service failed"):
+        BaseError.__init__(self)
+        self.code = 500
+        self.message = message
+        self.status = "SMS_FIELD"

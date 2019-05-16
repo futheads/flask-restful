@@ -1,20 +1,23 @@
 import logging
-import hashlib
 import time
+import hashlib
+import random
 
 from flask import request, g
 from flask_restplus import Resource
-from flask_api.api.user.serializers import login_req, login_resp, current_user_resp
 
-from flask_api.api.restplus import NotFoundError, ValidationError, api, login_check, BaseResponse, base_model, \
-    log_record
+from flask_api.api.commons.serializers import login_req, login_resp, phone_number_field, current_user_resp
+
+from flask_api.api.restplus import api, login_check, log_record, BaseResponse, base_model
+from flask_api.api.errors import NotFoundError, ValidationError, SMSError
 from flask_api.database.models import User
 from flask_api.database import redis_store
+from flask_api.api.utils import send_sms
 
 
 log = logging.getLogger(__name__)
 
-ns = api.namespace("", description="Operations related to login")
+ns = api.namespace("common", description="Operations related to common")
 
 
 @ns.route("/login")
@@ -85,4 +88,62 @@ class Logout(Resource):
         pipeline.hmset("user:%s" % user.phone_number, {"app_online": 0})
         pipeline.execute()
         return BaseResponse(None, message="注销成功")
+
+
+@ns.route("/smsend")
+@api.response(400, "该用户已经存在,注册失败")
+@api.response(500, "短信服务不可用")
+class SMSend(Resource):
+    """
+    发送短信验证
+    """
+    @api.doc(security=None)
+    @log_record
+    @api.expect(phone_number_field)
+    @api.marshal_with(base_model)
+    def post(self):
+        phone_number = request.json.get("phone_number")
+        user = User.query.filter_by(phone_number=phone_number).first()
+
+        if user:
+            raise ValidationError("phone_number", message="该用户已经存在,注册失败")
+        validate_number = str(random.randint(100000, 1000000))
+        result, err_message = send_sms(phone_number, validate_number)
+
+        if not result:
+            raise SMSError("short message send fail")
+
+        pipeline = redis_store.pipeline()
+        pipeline.set("validate:%s" % phone_number, validate_number)
+        pipeline.expire("validate:%s" % phone_number, 60)
+        pipeline.execute()
+
+        return BaseResponse(None, message="发送成功")
+
+
+@ns.route("/smvalidate")
+@api.response(400, "验证码错误")
+class SMValidate(Resource):
+    """
+    验证短信
+    """
+    @api.doc(security=None)
+    @log_record
+    @api.expect()
+    @api.marshal_with(base_model)
+    def post(self):
+        data = request.json
+        phone_number = data.get("phone_number")
+        validate_number = data.get("validate_number")
+        validate_number_in_redis = redis_store.get("validate:%s" % phone_number)
+
+        if validate_number != validate_number_in_redis:
+            raise ValidationError("validate_number", message="验证码错误")
+
+        pipe_line = redis_store.pipeline()
+        pipe_line.set("is_validate:%s" % phone_number, "1")
+        pipe_line.expire("is_validate:%s" % phone_number, 120)
+        pipe_line.execute()
+
+        return BaseResponse(None, message="短信验证通过")
 

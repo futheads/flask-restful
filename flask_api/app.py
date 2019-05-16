@@ -28,7 +28,7 @@ def configure_app(flask_app):
 def initialize_app(flask_app):
     from flask_api.api.blog.endpoints import posts, categories
     from flask_api.api.user.endpoints import user
-    from flask_api.api.user.endpoints import login
+    from flask_api.api.commons.endpoints import common
     configure_app(flask_app)
 
     blueprint = Blueprint("api", __name__, url_prefix="/api")
