@@ -108,3 +108,5 @@ venv.bak/
 idea/
 
 flask_api/config_override.py
+
+migrations
