@@ -7,6 +7,7 @@ from flask_api.api.user.serializers import user_model
 
 from flask_api.api.restplus import api, login_check, log_record
 from flask_api.database.models import User
+from flask_api.api.utils import encrypted_password
 
 
 log = logging.getLogger(__name__)
@@ -39,6 +40,7 @@ class UserCollection(Resource):
         # is_validate = redis_store.get("is_validate:%s" % phone_number)
         # if is_validate != "1":
         #     raise ValidationError("is_validate", message="验证码没有通过")
+        data["password"] = encrypted_password(data["password"])
         create_user(data)
         # redis_store.delete("is_validate:%s" % phone_number)
         # redis_store.delete("register:%s" % phone_number)

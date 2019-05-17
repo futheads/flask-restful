@@ -19,5 +19,10 @@ configs = {
     "cert": {
         "cert_crt_path": "",
         "cert_key_path": ""
+    },
+    "qiniu": {
+        "access_key": "",
+        "secret_key": "",
+        "bucket_name": ""
     }
 }

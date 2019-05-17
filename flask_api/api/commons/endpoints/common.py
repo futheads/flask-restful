@@ -14,7 +14,7 @@ from flask_api.api.restplus import api, login_check, log_record, BaseResponse, b
 from flask_api.api.errors import NotFoundError, ValidationError, SMSError
 from flask_api.database.models import User
 from flask_api.database import redis_store
-from flask_api.api.utils import send_sms
+from flask_api.api.utils import send_sms, encrypted_password
 from flask_api.config import configs
 
 
@@ -48,7 +48,7 @@ class UserLogin(Resource):
         user = User.query.filter(User.phone_number == phone_number).one()
         if not user:
             raise NotFoundError("没有此用户")
-        if user.password != password:
+        if user.password != encrypted_password(password):
             raise ValidationError("密码错误")
         m = hashlib.md5()
         m.update(phone_number.encode("utf-8"))
