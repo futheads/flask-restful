@@ -29,3 +29,12 @@ current_user = api.inherit("current user", phone_number_field, {
 current_user_resp = api.inherit("current user resp", base_model, {
     "data": fields.Nested(current_user)
 })
+
+qiniu_token = api.model("qiniu token", {
+    "key": fields.String(required=True),
+    "q_token": fields.String(required=True)
+})
+
+qiniu_token_resp = api.inherit("qiniu token rsp", base_model, {
+    "data": fields.Nested(qiniu_token)
+})

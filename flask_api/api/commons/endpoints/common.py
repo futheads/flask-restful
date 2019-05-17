@@ -2,22 +2,31 @@ import logging
 import time
 import hashlib
 import random
+import uuid
 
 from flask import request, g
 from flask_restplus import Resource
+from qiniu import Auth
 
-from flask_api.api.commons.serializers import login_req, login_resp, phone_number_field, current_user_resp
-
+from flask_api.api.commons.serializers import login_req, login_resp, phone_number_field, current_user_resp, \
+    qiniu_token_resp
 from flask_api.api.restplus import api, login_check, log_record, BaseResponse, base_model
 from flask_api.api.errors import NotFoundError, ValidationError, SMSError
 from flask_api.database.models import User
 from flask_api.database import redis_store
 from flask_api.api.utils import send_sms
+from flask_api.config import configs
 
 
 log = logging.getLogger(__name__)
 
 ns = api.namespace("common", description="Operations related to common")
+
+access_key = configs["qiniu"]["access_key"]
+secret_key = configs["qiniu"]["secret_key"]
+bucket_name = configs["qiniu"]["bucket_name"]
+
+qiniu_auth = Auth(access_key, secret_key)
 
 
 @ns.route("/login")
@@ -77,7 +86,7 @@ class Logout(Resource):
     @log_record
     @login_check
     @api.marshal_with(base_model)
-    def post(self):
+    def put(self):
         """
         user logout
         :return:
@@ -146,4 +155,19 @@ class SMValidate(Resource):
         pipe_line.execute()
 
         return BaseResponse(None, message="短信验证通过")
+
+
+@ns.route("/qiniu_token")
+class QiniuToken(Resource):
+    """
+    获取七牛上传授权
+    """
+    @log_record
+    @login_check
+    @api.expect()
+    @api.marshal_with(qiniu_token_resp)
+    def get(self):
+        key = uuid.uuid4()
+        token = qiniu_auth.upload_token(bucket_name, key, 3600)
+        return BaseResponse({"key": key, "q_token": token}, message="获取七牛上传文件授权成功")
 

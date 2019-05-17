@@ -4,3 +4,4 @@ tornado==5.1.1
 watchdog==0.9.0
 fabric3==1.14.post1
 flask-redis==0.3.0
+qiniu==7.2.4
