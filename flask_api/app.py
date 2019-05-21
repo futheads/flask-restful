@@ -8,7 +8,7 @@ from flask_api.api.restplus import api
 
 app = Flask(__name__)
 
-logging_conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "logging.conf"))
+logging_conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "logging.ini"))
 logging.config.fileConfig(logging_conf_path)
 log = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ def initialize_app(flask_app):
 
 def main():
     initialize_app(app)
-    log.info(">>>>> Starting development server at http://{}/api/ <<<<<".format(app.config["SERVER_NAME"]))
+    # log.info(">>>>> Starting development server at http://{}/api/ <<<<<".format(app.config["SERVER_NAME"]))
 
 
 main()
