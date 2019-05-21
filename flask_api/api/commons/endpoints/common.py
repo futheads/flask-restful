@@ -171,3 +171,11 @@ class QiniuToken(Resource):
         token = qiniu_auth.upload_token(bucket_name, key, 3600)
         return BaseResponse({"key": key, "q_token": token}, message="获取七牛上传文件授权成功")
 
+
+@api.route('/hello')
+class HelloWorld(Resource):
+
+    def get(self):
+        from flask_api.api.utils import send_email
+        send_email("Hello", "futhead@163.com", ["futhead@163.com"], "Hello", "World")
+        return {'hello': 'world'}

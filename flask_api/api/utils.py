@@ -1,4 +1,7 @@
 import hashlib
+from flask_mail import Message
+from flask_api.app import mail, app
+from flask_api.api.restplus import async
 
 
 def send_sms(phone_number, validate_number):
@@ -21,3 +24,16 @@ def encrypted_password(password):
     md5 = hashlib.md5()
     md5.update(password.encode("utf-8"))
     return md5.hexdigest()
+
+
+@async
+def send_async_email(_app, msg):
+    with _app.app_context():
+        mail.send(msg)
+
+
+def send_email(subject, sender, recipients, text_body, html_body):
+    msg = Message(subject, sender=sender, recipients=recipients)
+    msg.body = text_body
+    msg.html = html_body
+    send_async_email(app, msg)

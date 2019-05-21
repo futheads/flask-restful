@@ -10,6 +10,7 @@ from flask_api.api.errors import ServerError, NotFoundError, NotAuthorizedError,
     DatabaseNotFoundError, SMSError
 from flask_api.database import redis_store
 from flask_api.database.models import User
+from threading import Thread
 
 log = logging.getLogger(__name__)
 
@@ -97,3 +98,15 @@ def log_record(f):
         log.info("Response: %s" % response)
         return response
     return decorator
+
+
+def async(f):
+    """
+    启动线程执行
+    :param f:
+    :return:
+    """
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper

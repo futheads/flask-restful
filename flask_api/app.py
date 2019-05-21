@@ -2,6 +2,7 @@ import os
 import logging.config
 
 from flask import Flask, Blueprint
+from flask_mail import Mail
 from flask_api.database import db, redis_store
 from flask_api.config import configs
 from flask_api.api.restplus import api
@@ -11,6 +12,8 @@ app = Flask(__name__)
 logging_conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "logging.ini"))
 logging.config.fileConfig(logging_conf_path)
 log = logging.getLogger(__name__)
+
+mail = Mail()
 
 
 def configure_app(flask_app):
@@ -24,12 +27,18 @@ def configure_app(flask_app):
     flask_app.config["RESTPLUS_MASK_SWAGGER"] = configs["flaskplus"]["restplus_mask_swagger"]
     flask_app.config["ERROR_404_HELP"] = configs["flaskplus"]["restplus_error_404_help"]
 
+    app.config["MAIL_SERVER"] = configs["mail"]["server"]
+    app.config["MAIL_PORT"] = configs["mail"]["port"]
+    app.config["MAIL_USERNAME"] = configs["mail"]["username"]
+    app.config["MAIL_PASSWORD"] = configs["mail"]["password"]
+
 
 def initialize_app(flask_app):
     from flask_api.api.blog.endpoints import posts, categories
     from flask_api.api.user.endpoints import user
     from flask_api.api.commons.endpoints import common
     configure_app(flask_app)
+    mail.init_app(app)
 
     blueprint = Blueprint("api", __name__, url_prefix="/api")
     api.init_app(blueprint)

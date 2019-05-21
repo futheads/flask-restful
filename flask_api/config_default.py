@@ -1,7 +1,6 @@
 """
 Default configurations.
 """
-
 configs = {
     "flask_debug": True,
     "flask_server_name": "127.0.0.1:5000",
@@ -24,5 +23,11 @@ configs = {
         "access_key": "",
         "secret_key": "",
         "bucket_name": ""
+    },
+    "mail": {
+        "server": "localhost",
+        "port": 25,
+        "username": None,
+        "password": None
     }
 }
