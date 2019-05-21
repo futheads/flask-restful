@@ -1,12 +1,13 @@
 import logging
 
-from flask import request
+from flask import request, g
 from flask_restplus import Resource
 from flask_api.api.user.business import create_user, update_user, delete_user
-from flask_api.api.user.serializers import user
+from flask_api.api.user.serializers import user_model
 
 from flask_api.api.restplus import api, login_check, log_record
 from flask_api.database.models import User
+from flask_api.api.utils import encrypted_password
 
 
 log = logging.getLogger(__name__)
@@ -19,7 +20,7 @@ class UserCollection(Resource):
 
     @log_record
     @login_check
-    @api.marshal_list_with(user)
+    @api.marshal_list_with(user_model)
     def get(self):
         """
         Returns list of users.
@@ -29,13 +30,20 @@ class UserCollection(Resource):
 
     @api.doc(security=None)
     @api.response(201, "User successfully created.")
-    @api.expect(user)
+    @api.expect(user_model)
     def post(self):
         """
         Creates a new blog category.
         """
         data = request.json
+        # phone_number = data.get("phone_number")
+        # is_validate = redis_store.get("is_validate:%s" % phone_number)
+        # if is_validate != "1":
+        #     raise ValidationError("is_validate", message="验证码没有通过")
+        data["password"] = encrypted_password(data["password"])
         create_user(data)
+        # redis_store.delete("is_validate:%s" % phone_number)
+        # redis_store.delete("register:%s" % phone_number)
         return None, 201
 
 
@@ -45,7 +53,7 @@ class UserItem(Resource):
 
     @log_record
     @login_check
-    @api.marshal_with(user)
+    @api.marshal_with(user_model)
     def get(self, id):
         """
         Returns a category with a list of posts.
@@ -54,7 +62,7 @@ class UserItem(Resource):
 
     @log_record
     @login_check
-    @api.expect(user)
+    @api.expect(user_model)
     @api.response(204, "Category successfully updated.")
     def put(self, id):
         """
@@ -73,5 +81,3 @@ class UserItem(Resource):
         """
         delete_user(id)
         return None, 204
-
-
