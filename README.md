@@ -140,6 +140,7 @@ class UserInfo(Resource):
 * [Flask大型教程项目](http://www.pythondoc.com/flask-mega-tutorial/index.html)
 * [描述怎样通过flask+redis+sqlalchemy等工具，开发restful api](https://www.cnblogs.com/ExMan/p/9510019.html)
 * [使用 supervisor 管理进程](http://liyangliang.me/posts/2015/06/using-supervisor/)
+* [Building beautiful REST APIs using Flask, Swagger UI and Flask-RESTPlus](http://michal.karzynski.pl/blog/2016/06/19/building-beautiful-restful-apis-using-flask-swagger-ui-flask-restplus/)
 ## 关于作者
 futhead，2013年6月毕业于某二流大学核化工与核燃料工程专业，后在某IDC机房做网管，期间自学编程，依次从事过Android，PHP，JavaWeb，前端，测试，运维，GIS，大数据等相关开发工作，如无意外，下份工作应该是Python全栈，侧重NLP方向。
 ## 参与贡献
