@@ -50,11 +50,11 @@ secret_key = configs["qiniu"]["secret_key"]
 开发过程中可以运行hot_deploy.py文件，该脚本使用watchdog对当前目录下所有后缀为.py的文件进行监控，只要有变化，就会重启tornado_server.py，省去了开发过程中无休止的重启操作，参考廖雪峰的[Day 13 - 提升开发效率](https://www.liaoxuefeng.com/wiki/1016959663602400/1018491156860224)
 ## 日志
 使用logging，通过文件[logging.ini配置](https://docs.python.org/3/library/logging.config.html)，目前支持console、file及mail三种处理方式
+## 服务监控
+使用supervisor，配置写在supervisord.ini，具体参考[使用 supervisor 管理进程](http://liyangliang.me/posts/2015/06/using-supervisor/)
 ## 部署
 ### 集成tornado服务器
 使用tornado作为服务器，可以直接运行tornado_server.py启动项目，如果配置了证书，则默认启动https服务，否则启动http服务
-## 服务监控
-使用supervisor，配置写在supervisord.ini，具体参考[使用 supervisor 管理进程](http://liyangliang.me/posts/2015/06/using-supervisor/)
 ### fabric: 自动部署
 使用[fabric3](http://www.fabfile.org/)自动打包发布项目，并支持回滚
 常用操作（不指定脚本文件默认执行fabfile.py）：  
