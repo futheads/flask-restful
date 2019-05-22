@@ -50,17 +50,6 @@ secret_key = configs["qiniu"]["secret_key"]
 开发过程中可以运行hot_deploy.py文件，该脚本使用watchdog对当前目录下所有后缀为.py的文件进行监控，只要有变化，就会重启tornado_server.py，省去了开发过程中无休止的重启操作，参考廖雪峰的[Day 13 - 提升开发效率](https://www.liaoxuefeng.com/wiki/1016959663602400/1018491156860224)
 ## 日志
 使用logging，通过文件[logging.ini配置](https://docs.python.org/3/library/logging.config.html)，目前支持console、file及mail三种处理方式
-## 服务监控
-使用supervisor，配置写在supervisord.ini，具体参考[使用 supervisor 管理进程](http://liyangliang.me/posts/2015/06/using-supervisor/)
-## 部署
-### 集成tornado服务器
-使用tornado作为服务器，可以直接运行tornado_server.py启动项目，如果配置了证书，则默认启动https服务，否则启动http服务
-### fabric: 自动部署
-使用[fabric3](http://www.fabfile.org/)自动打包发布项目，并支持回滚
-常用操作（不指定脚本文件默认执行fabfile.py）：  
-* 打包：fab build
-* 部署：fab deploy
-* 回滚：fab rollback
 ## 单元测试
 这里直接使用[requests](https://2.python-requests.org//zh_CN/latest/)对api接口测试
 ## 一些常用功能
@@ -129,6 +118,17 @@ class UserInfo(Resource):
 使用了Flask的插件[Flask-Mail](https://pythonhosted.org/Flask-Mail/)，Flask-Mail提供了一个简单的接口来集成SMTP与Flask应用程序并发送邮件，具体实现参考app.py和flask_api/api/utils.py  
 ### 短信验证码
 没有接入第三方的短信平台，但实现了短信验证的逻辑，具体参考flask_api/api/commons/endpoints/common.py
+## 服务监控
+使用supervisor，配置写在supervisord.ini，具体参考[使用 supervisor 管理进程](http://liyangliang.me/posts/2015/06/using-supervisor/)
+## 部署
+### 集成tornado服务器
+使用tornado作为服务器，可以直接运行tornado_server.py启动项目，如果配置了证书，则默认启动https服务，否则启动http服务
+### fabric: 自动部署
+使用[fabric3](http://www.fabfile.org/)自动打包发布项目，并支持回滚
+常用操作（不指定脚本文件默认执行fabfile.py）：  
+* 打包：fab build
+* 部署：fab deploy
+* 回滚：fab rollback
 ## 参考文档
 * [Flask-RESTPlus](https://flask-restplus.readthedocs.io/en/stable/)
 * [Flask-SQLAlchemy](http://www.pythondoc.com/flask-sqlalchemy/quickstart.html)
