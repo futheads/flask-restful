@@ -3,9 +3,13 @@
 机缘巧合，这段时间刚好有空，所以整合了一个restful风格的开发框架，包括swagger文档，ORM，数据库迁移，热发布，服务监控，日志和异常的统一处理，一键部署到服务器（支持多台）及一些常用功能，使用redis存储token鉴权，天然支持分布式，通过大量的整合扩展库来减少了代码量，提高了开发效率。  
 目标是一个人能hold住一个中型项目
 ## Quick start
-```
+### 初始化
+```buildoutcfg
 git clone git@github.com:futheads/flask-restful.git
 cd flask-restful
+```
+###安装并运行
+```
 pip install -r requirements.txt
 python tornado_server.py
 ```
