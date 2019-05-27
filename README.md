@@ -4,11 +4,18 @@
 目标是一个人能hold住一个中型项目
 ## Quick start
 ### 初始化
-```
+```buildoutcfg
 git clone git@github.com:futheads/flask-restful.git
 cd flask-restful
+```
+###安装并运行
+```
 pip install -r requirements.txt
 python tornado_server.py
+```
+如果使用docker及docker-compose，则直接运行
+```buildoutcfg
+docker-compose up
 ```
 浏览器访问API文档页面 [http://localhost:5000/api/](http://localhost:5000/api/)
 ## web核心框架
